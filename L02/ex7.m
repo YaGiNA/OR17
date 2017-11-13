@@ -2,7 +2,7 @@
   LIST={'cat' 'dog' 'elephant' 'fish' 'horse' 'lion' 'penguin' 'tiger' 'whale' 'wildcat'};
   DIR0='/usr/local/class/object/animal/';
   for i=1:length(LIST)
-    DIR=strcat(DIR0,LIST(i),'/')
+    DIR=strcat(DIR0,LIST(i),'/');
     W=dir(DIR{:});
     for j=1:size(W)
       if (strfind(W(j).name,'.jpg'))
@@ -28,6 +28,7 @@ save('db.mat','database');
 load('db.mat');
 N = 555;
 query=database(N,:);
+sim=[];
 for i=1:size(database,1)
     sim=[sim sum(min(database(i,:),query))];
 end
