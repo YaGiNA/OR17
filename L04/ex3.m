@@ -8,7 +8,7 @@ sel=randperm(900,100);
 rand_neg_imgs=database_neg(sel,:);
 vec=[];
 for i = 1:100
-    I_pos = rand_pos_imgs(i);
+    I_pos = rand_pos_imgs(i, :);
     [pnt_pos,desc_pos] = sift_rand(I_pos,'randn',300);
     
 end
