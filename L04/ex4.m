@@ -1,3 +1,5 @@
+run('/usr/local/class/object/MATLAB/vlfeat/vl_setup');
+addpath('/usr/local/class/object/MATLAB/sift');
 load('codebook.mat');
 load('db_pos.mat');
 load('db_neg.mat');
