@@ -69,5 +69,5 @@ rate = ok / (ok + ng);
 fprintf('classification rate: %.5f\n',rate);
 %{
 実行例
-
+classification rate: 0.49500
 %}
