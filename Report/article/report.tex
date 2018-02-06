@@ -6,6 +6,7 @@
 \usepackage{ascmac}
 \usepackage{listings}
 \usepackage{underscore}
+\usepackage{url}
 \lstset{
     frame=single,
     numbers=left,
@@ -34,7 +35,94 @@
 \tableofcontents
 \chapter{2クラス物体分類実験}
 \section{課題内容}
+異なる2クラス各200枚の画像データセットをそれぞれポジティブ画像・ネガティブ画像として分類し、
+それらを対象に2クラス画像分類を行った。
+今回対象としてのは以下のパターンである。
+\begin{itemize}
+  \item ポジティブ: タスマニアデビル
+  \item ネガティブ: カピバラ
+\end{itemize}
+\begin{itemize}
+  \item ポジティブ: タスマニアデビル
+  \item ネガティブ: それ以外
+\end{itemize}
+なお"それ以外"とは、\texttt{/usr/local/class/object/bgimg}
+に存在する900枚の画像から無作為に選出した600枚(ポジティブ画像数の3倍)のことを指す。
+
+分類は以下の3種類の方法を行い、分類精度の比較を行った。
+\begin{itemize}
+  \item カラーヒストグラムと最近傍分類
+  \item BoFベクトルと非線形SVMによる分類
+  \item MatConvnetの標準ネットワーク(AlexNet)による DCNN特徴量と線形SVM
+\end{itemize}
+
+なお、評価は5-fold cross validation方式を採用した。
+
 \section{設計方針}
+\subsection{画像収集方法}
+実験に先立ち、画像の収集を行った。
+Flickerから画像を収集し、横幅320pxにリサイズされた画像へのURLを表示するサイト
+(https://goo.gl/v8wbsR)を使用した。
+検索ワードは
+\begin{itemize}
+  \item タスマニアデビル: Tasmanian Devil
+  \item カピバラ: Capybara
+\end{itemize}
+とした。得られた300枚の画像から明らかに当該動物が映っていない画像をここから除外し、
+さらに全体の画像が200枚になるように調整した。
+\subsection{codebook/filelist作成}
+予め、後の処理で使用する全ポジティブ・ネガティブ画像のSIFT特徴が記されたコードブックを作成した。
+また同時に分析対象のファイルのpathが記されたfilelistも作成した。
+該当スクリプトと出力結果ファイルは
+\begin{itemize}
+  \item タスマニアデビル/カピバラ
+  \begin{itemize}
+    \item codebook: \texttt{mk_codebook_tc.m} → \texttt{codebook-tc.mat}
+    \item filelist: \texttt{flist_tc.m} → \texttt{filelist-tc.mat}
+  \end{itemize}
+  \item タスマニアデビル/それ以外
+  \begin{itemize}
+    \item codebook: \texttt{mk_codebook_other.m} → \texttt{codebook-other.mat}
+    \item filelist: \texttt{flist_other.m} → \texttt{filelist-other.mat}
+  \end{itemize}
+\end{itemize}
+である。
+\subsection{カラーヒストグラムと最近傍分類}
+評価を行う\texttt{capybara_hist.m}(カピバラ相手)と\texttt{others_hist.m}(それ以外相手)、
+2者に共通して画像のカラーヒストグラムを返す関数\texttt{mk_hist.m}の2ファイルを作成した。
+最終的にどれだけの割合で正しくクラス分類できたか確率を返すようになっている。
+\subsection{BoFベクトルと非線形SVMによる分類}
+評価を行う部分と、入力された\texttt{filelist}記載の画像をBoFベクトル化して返す部分を関数として実装した。
+該当するスクリプト・出力結果ファイルは以下の通りである。
+\begin{itemize}
+  \item タスマニアデビル/カピバラ
+  \begin{itemize}
+    \item 評価: \texttt{bof_svm_tc.m}
+    \item BoF化: \texttt{mk_code_tc.m} → \texttt{all_bovw-tc.mat}
+  \end{itemize}
+  \item タスマニアデビル/それ以外
+  \begin{itemize}
+    \item 評価: \texttt{bof_svm_others.m}
+    \item BoF化: \texttt{mk_code_others.m} → \texttt{all_bovw-others.mat}
+  \end{itemize}
+\end{itemize}
+最終的にどれだけの割合で正しくクラス分類できたか確率を返すようになっている。
+\subsection{MatConvnetの標準ネットワークによる DCNN特徴量と線形SVM}
+評価を行う部分と、入力された\texttt{filelist}記載の画像のDCNN特徴量を返す部分を関数として実装した。
+該当するスクリプト・出力結果ファイルは以下の通りである。
+\begin{itemize}
+  \item タスマニアデビル/カピバラ
+  \begin{itemize}
+    \item 評価: \texttt{dcnn_svm_tc.m}
+    \item DCNN: \texttt{mk_dcnnlist.m} → \texttt{dcnn-tc.mat}
+  \end{itemize}
+  \item タスマニアデビル/それ以外
+  \begin{itemize}
+    \item 評価: \texttt{dcnn_svm_others.m}
+    \item DCNN: \texttt{mk_dcnnlist.m} → \texttt{dcnn-others.mat}
+  \end{itemize}
+\end{itemize}
+最終的にどれだけの割合で正しくクラス分類できたか確率を返すようになっている。
 \section{プログラムの説明}
 \section{実験}
 \section{考察}
@@ -47,14 +135,11 @@
 \section{考察}
 \section{感想}
 
-\chapter{付録: プログラムリスト}
+\appendix
+\chapter{プログラムリスト}
 \section{レポート課題1}
 \section{レポート課題2}
-
-
-
-
-
-
-
+\begin{thebibliography}{数字}
+  \bibitem{key1} K.Yanai, "物体認識論 演習 レポート課題", the-UEC(Last modified: 27-Jan-2018)
+\end{thebibliography}
 \end{document}
