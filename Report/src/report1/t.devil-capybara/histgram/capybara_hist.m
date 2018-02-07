@@ -39,7 +39,7 @@ for i=1:cv
       similars = [similars train(idx_sim)];
       tf = train_label(idx_sim);
       type = eval_label(k);
-      % 最も近い画像属性が評価画像の属性に誤っていると0
+      % 最も近い画像属性が評価画像の属性と誤っていると0
       % 正しければ1がacに格納される
       ac = [ac abs(tf+type)/2];
   end
