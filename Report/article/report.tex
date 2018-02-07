@@ -8,6 +8,7 @@
 \usepackage{underscore}
 \usepackage{url}
 \usepackage{subfig}
+\usepackage[]{mcode}
 \lstset{
     frame=single,
     numbers=left,
@@ -20,8 +21,6 @@
     keywordstyle=\color{blue},%
     morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
     identifierstyle=\color{black},%
-    stringstyle=\color{mylilas},
-    commentstyle=\color{mygreen},%
     showstringspaces=false,%without this there will be a symbol in the places where there is a space
     numbers=left,%
     numberstyle={\tiny \color{black}},% size of the numbers
@@ -115,12 +114,12 @@ Flickerから画像を収集し、横幅320pxにリサイズされた画像へ�
   \item t/c
   \begin{itemize}
     \item 評価: \texttt{bof_svm_tc.m}
-    \item BoF化: \texttt{mk_code_tc.m} → \texttt{all_bovw-tc.mat}
+    \item BoF化: \texttt{mk_svm_tc.m} → \texttt{all_bovw-tc.mat}
   \end{itemize}
   \item other
   \begin{itemize}
     \item 評価: \texttt{bof_svm_others.m}
-    \item BoF化: \texttt{mk_code_others.m} → \texttt{all_bovw-others.mat}
+    \item BoF化: \texttt{mk_svm_others.m} → \texttt{all_bovw-others.mat}
   \end{itemize}
 \end{itemize}
 最終的にどれだけの割合で正しくクラス分類できたか確率を返すようにした。
@@ -195,7 +194,11 @@ Flickerから画像を収集し、横幅320pxにリサイズされた画像へ�
 \subsection{BoFベクトルと非線形SVMによる分類}\label{sec:descBof}
 \subsubsection{画像のBoFベクトル化}
 \begin{itemize}
-  \item 該当スクリプト: \texttt{mk_code.m}
+  \item 該当スクリプト
+  \begin{itemize}
+    \item t/c: \texttt{mk_code.m}
+    \item other: \texttt{mk_code_other.m}
+  \end{itemize}
 \end{itemize}
 こちらでは、予め解析対象となる全画像(t/c: 400枚, other:800枚)をBoFベクトル化させて、
 結果を\texttt{*.mat}として保存している。
@@ -345,7 +348,7 @@ Flickerから画像を収集し、横幅320pxにリサイズされた画像へ�
 \section{考察}
 \subparagraph{カラーヒストグラムと最近傍分類}
 3方法の中では、カラーヒストグラムが最も不安定な分類を行っていたことが読み取れた。
-また、図\ref{fig:t/c}, \ref{fig:other}
+また、図\ref{fig:tc}, \ref{fig:other}
 のカラーヒストグラムによる誤答画像を肉眼で見ても、
 あまり類似性を見ることができなかった。
 これはカラーヒストグラムによる最近傍分類は、
@@ -378,6 +381,23 @@ t/c, otherともに適合率が約98\%と非常に安定した数値となって
 \appendix
 \chapter{プログラムリスト}
 \section{レポート課題1}
+\subsection{codebook/filelist作成}
+
+\subsection{カラーヒストグラムと最近傍分類}
+\lstinputlisting[caption=capybara_hist.m]{src/report1/t.devil-capybara/histgram/capybara\string_hist.m}
+\lstinputlisting[caption=others_hist.m]{src/report1/t.devil-others/histgram/others\string_hist.m}
+\lstinputlisting[caption=mk_hist.m]{src/report1/t.devil-capybara/histgram/mk\string_hist.m}
+\subsection{BoFベクトルと非線形SVMによる分類}
+\lstinputlisting[caption=mk_code.m]{src/report1/t.devil-capybara/bof-svm/mk\string_code.m}
+\lstinputlisting[caption=mk_code_other.m]{src/report1/t.devil-others/bof-svm/mk\string_code\string_others.m}
+\lstinputlisting[caption=bof_svm_tc.m]{src/report1/t.devil-capybara/bof-svm/bof\string_svm\string_tc.m}
+\lstinputlisting[caption=bof_svm_other.m]{src/report1/t.devil-others/bof-svm/bof\string_svm\string_others.m}
+\subsection{MatConvnetの標準ネットワークによる DCNN特徴量と線形SVM}
+\lstinputlisting[caption=mk_dcnnlist.m]{src/report1/t.devil-capybara/dcnn-svm/mk\string_dcnnlist.m}
+\lstinputlisting[caption=dcnn_svm_tc.m]{src/report1/t.devil-capybara/dcnn-svm/dcnn\string_svm\string_tc.m}
+\lstinputlisting[caption=dcnn_svm_other.m]{src/report1/t.devil-others/dcnn-svm/dcnn\string_svm\string_others.m}
+
+
 \section{レポート課題2}
 \begin{thebibliography}{数字}
   \bibitem{key1} K.Yanai, "物体認識論 演習 レポート課題", the-UEC(Last modified: 27-Jan-2018)
