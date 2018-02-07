@@ -28,6 +28,7 @@ for i=1:cv
   end
   % 評価データのカラーヒストグラムに最も近いdbの行を探索
   ac = [];
+  similars = [];
   for k=1:size(eval, 2)
       histgram = mk_hist(eval{k});
       sim = [];
@@ -35,6 +36,7 @@ for i=1:cv
           sim = [sim sum(min(db(i, :), histgram))];
       end
       [similar, idx_sim] = min(sim);
+      similars = [similars train(idx_sim)];
       tf = train_label(idx_sim);
       type = eval_label(k);
       % 最も近い画像属性が評価画像の属性に誤っていると0
