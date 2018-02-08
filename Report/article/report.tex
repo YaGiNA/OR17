@@ -3,6 +3,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{bm}
 \usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
 \usepackage{ascmac}
 \usepackage{listings,jlisting}
 \usepackage{underscore}
@@ -75,17 +76,6 @@
 なお、評価は5-fold cross validation方式を採用した。
 
 \section{設計方針}
-\subsection{画像収集方法}\label{sec:collectimg}
-実験に先立ち、画像の収集を行った。
-Flickerから画像を収集し、横幅320pxにリサイズされた画像へのURLを表示するサイト
-(https://goo.gl/v8wbsR)を使用した。
-検索ワードは
-\begin{itemize}
-  \item タスマニアデビル: Tasmanian Devil
-  \item カピバラ: Capybara
-\end{itemize}
-とした。得られた300枚の画像から明らかに当該動物が映っていない画像をここから除外し、
-さらに全体の画像が200枚になるように調整した。
 \subsection{codebook/filelist作成}\label{sec:mkCdBookFlist}
 予め、後の処理で使用する全ポジティブ・ネガティブ画像のSIFT特徴が記されたコードブックを作成した。
 また同時に分析対象のファイルのpathが記されたfilelistも作成した。
@@ -294,6 +284,17 @@ Flickerから画像を収集し、横幅320pxにリサイズされた画像へ�
 最後は、両クラスにおいて誤りだった画像を出力するための処理が下に続く。
 
 \section{実験}
+\subsection{画像収集方法}\label{sec:collectimg}
+実験に先立ち、画像の収集を行った。
+Flickerから画像を収集し、横幅320pxにリサイズされた画像へのURLを表示するサイト
+(https://goo.gl/v8wbsR)を使用した。
+検索ワードは
+\begin{itemize}
+  \item タスマニアデビル: Tasmanian Devil
+  \item カピバラ: Capybara
+\end{itemize}
+とした。得られた300枚の画像から明らかに当該動物が映っていない画像をここから除外し、
+さらに全体の画像が200枚になるように調整した。
 \subsection{適合率}
 各方法における適合率は以下の表の通りとなった。
 \begin{table}[h]
@@ -346,7 +347,7 @@ Flickerから画像を収集し、横幅320pxにリサイズされた画像へ�
   \end{center}
 \end{figure}
 \section{考察}
-\subparagraph{カラーヒストグラムと最近傍分類}
+\subsection{カラーヒストグラムと最近傍分類}
 3方法の中では、カラーヒストグラムが最も不安定な分類を行っていたことが読み取れた。
 また、図\ref{fig:tc}, \ref{fig:other}
 のカラーヒストグラムによる誤答画像を肉眼で見ても、
@@ -354,7 +355,7 @@ Flickerから画像を収集し、横幅320pxにリサイズされた画像へ�
 これはカラーヒストグラムによる最近傍分類は、
 あまり精度の高いものではないことを強く示していると考えられた。
 
-\subparagraph{BoFベクトルと非線形SVMによる分類}
+\subsection{BoFベクトルと非線形SVMによる分類}
 t/c, other双方の適合率を見ると、カラーヒストグラムよりはいずれも高かった。
 特にt/cにおいてはDCNNと比べても遜色ない精度となっていたものの、
 otherにおいては明らかに精度が落ちていることが表\ref{tb:accuracy}から読み取れた。
@@ -363,7 +364,7 @@ otherにおいては明らかに精度が落ちていることが表\ref{tb:accu
 分離平面を定めることが容易であったものの、otherではネガティブが特定の動物に限定していなかった
 影響で分離が難しくなったことが原因として考えられる。
 
-\subparagraph{MatConvnetの標準ネットワークによる DCNN特徴量と線形SVM}
+\subsection{MatConvnetの標準ネットワークによる DCNN特徴量と線形SVM}
 t/c, otherともに適合率が約98\%と非常に安定した数値となっていた。
 
 詳しく見るとotherの適合率がt/cより0.75\%優れた結果となっているが、
@@ -387,11 +388,142 @@ t/c, otherともに適合率が約98\%と非常に安定した数値となって
 最終的にポジティブ画像のソートなしの上位100枚中と、
 SVMの出力スコア上位100枚中の正解率(ノイズは不正解)の比較を行った。
 \section{設計方針}
-\section{プログラムの説明}
-\section{実験}
-\section{考察}
-\section{感想}
+\subsection{学習準備}
+学習で使用する画像の取得は、第\ref{sec:mkCdBookFlist}節にて使用したスクリプトを流用した。
 
+なお、今回はポジティブ画像の一部のみを評価で使うため、スクリプト内ではその部分を評価用として分離している。
+\subsection{学習・評価}
+DCNN特徴量を線形SVMで分類するため、学習・評価の実行部分は第\ref{sec:defdcnn}節のスクリプトを一部流用した。
+なお、今回は5-fold cross validation方式を採用していないため、該当する部分を削除している。
+\subsection{ソート}
+課題実行スクリプトの最後に、類似度が高い順に評価画像へのパスと適合度をtxtファイル各行に出力する部分を作成した。
+そのtxtファイルと、講義サイト記載のPerlスクリプト\cite{kougi}を用いて適合度が高い画像とその適合度を表示するHTMLファイルを作成した。
+\section{プログラムの説明}
+\subsection{学習準備}
+\begin{itemize}
+  \item 該当スクリプト
+  \begin{itemize}
+    \item \texttt{report2.m \#1-9}
+    \item \texttt{flist_others.m}
+    \item \texttt{flist_thisdir.m}
+  \end{itemize}
+\end{itemize}
+学習/評価に使用する画像のpathを持つを取得している。
+その後、ポジティブ画像の内上位25(or 50の値をnに代入)
+枚と全ネガティブ画像を学習用(\texttt{list})とし、
+残りのポジティブ画像を評価用画像(\texttt{eval})としている。
+\subsection{学習}
+\begin{itemize}
+  \item 該当スクリプト
+  \begin{itemize}
+    \item \texttt{report2.m \#11-15}
+    \item \texttt{mk_dcnnlist.m}
+  \end{itemize}
+\end{itemize}
+学習用画像のDCNN特徴を取得している。
+使用関数は第\ref{sec:descDcnn}節と同じものを説明しているため詳しい説明はそちらを参照のこと。
+\subsection{評価}
+\begin{itemize}
+  \item 該当スクリプト
+  \begin{itemize}
+    \item \texttt{report2.m \#16-25}
+    \item \texttt{mk_dcnnlist.m}
+  \end{itemize}
+\end{itemize}
+評価用画像のDCNN特徴を取得し、線形SVMによって分類を行っている。
+こちらも使用関数は第\ref{sec:descDcnn}節と同じものを説明しているため詳しい説明はそちらを参照のこと。
+
+なお、今回では\texttt{label}ではなく\texttt{score}を評価に使用する。
+これは各評価画像の適合スコアや該当画像のインデックスが記載されており、
+適合スコアが正ならポジティブ寄り、負ならネガティブ寄りであることを表している。
+今回ではこの後\texttt{score}内の適合スコアを降順に並べ替え、同時に該当画像のインデックスを併記させた。
+
+\subsection{出力}
+\begin{itemize}
+  \item 該当スクリプト: \texttt{report2.m \#27-}
+\end{itemize}
+適合スコアの降順にスコアと該当画像のインデックスを元にした画像パスを1行ずつtxtファイルへ出力している。
+なお、今回は上位100画像を出力することにした。
+\section{実験}
+\subsection{画像収集方法}
+大まかな流れは第\ref{sec:collectimg}節と同様である。
+検索ワードは"Tasmanian Devil"としてORDERはLatest、
+取得した画像は300枚とした。
+\subsection{画像一覧}
+実験の結果を表示する前に、Flickerで取得した上位画像の一覧が次の図\ref{fig:flicker}である。
+\begin{figure}[t]
+  \begin{center}
+    \includegraphics[scale=0.25,angle=90]{imgs/raw-upper.jpg}
+  \end{center}
+  \caption{Flicker画像検索結果上位画像一覧}
+  \label{fig:flicker}
+\end{figure}
+実際に実行して得られた適合スコアを降順に並べ替えたのが以下の図
+\ref{fig:downer25}, \ref{fig:downer50}である。
+\begin{figure}[t]
+  \begin{center}
+    \includegraphics[scale=0.25,angle=90]{imgs/score25-upper.jpg}
+    \caption{DCNN-線形SVM適合スコア降順ソート時上位画像一覧(学習使用ポジティブ画像数:25)}
+    \label{fig:downer25}
+  \end{center}
+\end{figure}
+\begin{figure}[t]
+  \begin{center}
+    \includegraphics[scale=0.25,angle=90]{imgs/score50-upper.jpg}
+    \caption{DCNN-線形SVM適合スコア降順ソート時上位画像一覧(学習使用ポジティブ画像数:50)}
+    \label{fig:downer50}
+  \end{center}
+\end{figure}
+\subsection{正解画像数}
+Flicker画像検索上位と、DCNN-線形SVM適合スコア(N=25, 50)上位のそれぞれ100枚の中から、
+実際にタスマニアデビルが写っているものを正解として、それぞれ何枚正解だったのかカウントした。
+なお、厳密な正誤判定の基準は以下の通りである。
+\begin{itemize}
+  \item 正解
+  \begin{itemize}
+    \item 実際にタスマニアデビルがそのまま写っている(単独・他の動物含めた複数不問)
+    \item タスマニアデビルが写っている写真を写している(看板の写真など)
+    \item タスマニアデビルが写っているが、一部ポストプロセスが行われている(サンタ帽を被っている,モノクロ化等)
+  \end{itemize}
+  \item 不正解
+  \begin{itemize}
+    \item タスマニアデビルが写っていない(他の動物, 風景写真, etc.)
+    \item タスマニアデビルを模した像や絵
+  \end{itemize}
+\end{itemize}
+この基準を基に正誤判定を行った時の正解画像枚数と、
+nの数値毎の上位100枚の適合スコアの平均値と標準偏差は以下の表\ref{tb:crct}の通りとなった。
+\begin{table}[h]
+  \caption{各分類クラス・分類方法における適合率}
+  \label{tb:crct}
+  \begin{center}
+    \begin{tabular}{cccc} \hline
+      種類 & 正解枚数 & 平均値 & 標準偏差 \\ \hline
+      Flicker画像検索上位 & 87 & N/A & N/A \\
+      DCNN特徴量-線形SVM(n = 25) & 100 & 0.1850 & 0.2922 \\
+      DCNN特徴量-線形SVM(n = 50) & 99 & 0.6711 & 0.3676 \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\section{考察}
+\subsection{分類成功枚数}\label{sec:analsuccess}
+DCNN特徴量-線形SVMによる分類では、Flicker画像検索上位の正解枚数と比べて高い水準となった。
+これは、今回のモデルと画像データセットがタスマニアデビルの有無を判定するために非常に有力なこのであったことを示唆している。
+
+なお、n=25では全枚数が正解となったものの、n=25では1枚不正解が入っていた。
+これは、Flicker画像検索上位25枚より50枚の方が不正解画像の割合が高く、
+その影響が学習時に出たことが考えられる。
+
+\subsection{適合スコア}
+n=25, 50の適合スコアの平均値・標準偏差を見ると、
+n=50の方が平均値が大きく、上位の画像においては安定して分類できていたことが読み取れた。
+これはn=50の方が学習時にポジティブのサンプルの割合が高い分信頼性が高まっているためと考えられる。
+
+しかしながら標準偏差で見ると、n=25の方が値が小さくなっていることが読み取れた。
+これは第\ref{sec:analsuccess}と同様に、
+n=50の方がノイズが多く一部のポジティブ画像がその影響を受けたことが原因として考えられる。
+\section{感想}
+DCNN特徴量-線形SVMによる分類では、学習においてポジティブ画像のサンプルが例え少なくても、ある程度信頼性のある分類が行えることがわかった。
 \appendix
 \chapter{プログラムリスト}
 \section{レポート課題1}
@@ -415,7 +547,7 @@ SVMの出力スコア上位100枚中の正解率(ノイズは不正解)の比較
 \lstinputlisting[caption=dcnn_svm_other.m]{src/report1/t.devil-others/dcnn-svm/dcnn\string_svm\string_others.m}
 \section{レポート課題2}
 \lstinputlisting[caption=report2.m]{src/report2/report2.m}
-\begin{thebibliography}{数字}
-  \bibitem{key1} K.Yanai, "物体認識論 演習 レポート課題", the-UEC(Last modified: 27-Jan-2018)
+\begin{thebibliography}{9}
+  \bibitem{kougi} K.Yanai, "物体認識論 演習 レポート課題", the-UEC(Last modified: 27-Jan-2018)
 \end{thebibliography}
 \end{document}
